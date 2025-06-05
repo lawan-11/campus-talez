@@ -6,6 +6,7 @@
     <meta name="description" content="Campus Talez - Your premier platform for sharing and discovering authentic campus stories, experiences, and insights from students worldwide.">
     <title>Campus Talez - Share Your Campus Story</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="direct-messages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
 </head>
 <body>
@@ -15,45 +16,115 @@
             <ul>
                 <li><a href="#" class="active">Home</a></li>
                 <li><a href="#stories">Stories</a></li>
-                <li><a href="#write">Write</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="live-discussion.html">Live Chat</a></li>
             </ul>
+            <div class="auth-buttons">
+                <button class="login-btn" onclick="openLoginModal()">Login</button>
+                <button class="register-btn" onclick="openRegisterModal()">Register</button>
+            </div>
         </nav>
+        <button id="newPostBtn" class="new-post-btn" onclick="toggleWritePanel()" aria-label="Create new post">
+            <span class="icon">✏️</span>
+            <span class="text">Write a Story</span>
+        </button>
     </header>
 
-    <main>
-        <div class="container">
-            <section class="write-blog" id="write">
-                <h2>Share Your Campus Story</h2>
-                <form id="blogForm">
-                    <input type="text" id="blogTitle" placeholder="Your story title..." required>
-                    <input type="text" id="author" placeholder="Your name..." required>
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <h2>Login</h2>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button type="submit" class="submit-btn">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRegisterModal()">&times;</span>
+            <h2>Register</h2>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <input type="text" id="registerName" placeholder="Full Name" required>
+                <input type="email" id="registerEmail" placeholder="Email" required>
+                <input type="password" id="registerPassword" placeholder="Password" required>
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                <button type="submit" class="submit-btn">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Write Story Panel -->
+    <div id="writePanel" class="write-panel">
+        <div class="write-panel-content">
+            <div class="panel-header">
+                <h2>Share Your Story</h2>
+                <button class="close-panel" onclick="toggleWritePanel()" aria-label="Close panel">×</button>
+            </div>
+            <form id="blogForm">
+                <div class="form-group">
+                    <input type="text" id="blogTitle" placeholder="Give your story a catchy title..." required>
+                    <span class="field-helper">A clear, engaging title helps your story stand out</span>
+                </div>
+                
+                <div class="form-group">
                     <select id="category" required>
-                        <option value="">Select Category</option>
+                        <option value="">Select a Category</option>
                         <option value="academic">Academic Life</option>
                         <option value="social">Social Experience</option>
                         <option value="culture">Campus Culture</option>
                         <option value="events">Events & Activities</option>
                         <option value="tips">Tips & Advice</option>
                     </select>
-                    <div class="editor-toolbar">
-                        <button type="button" onclick="formatText('bold')" title="Bold"><strong>B</strong></button>
-                        <button type="button" onclick="formatText('italic')" title="Italic"><em>I</em></button>
-                        <button type="button" onclick="formatText('code')" title="Code">{'}'}</button>
-                        <button type="button" onclick="addHeading()" title="Add Heading">H</button>
-                    </div>
-                    <textarea id="blogContent" placeholder="Write your story here... Use Markdown for formatting!" required></textarea>
-                    <div class="post-meta">
-                        <input type="text" id="tags" placeholder="Tags (comma separated)">
-                        <label class="featured-checkbox">
-                            <input type="checkbox" id="featured">
-                            Mark as Featured Story
-                        </label>
-                    </div>
-                    <button type="submit" class="publish-btn">Publish Story</button>
-                </form>
-            </section>
+                    <span class="field-helper">Choose the most relevant category for your story</span>
+                </div>
 
+                <div class="form-group">
+                    <div class="editor-toolbar" role="toolbar" aria-label="Text formatting options">
+                        <button type="button" onclick="formatText('bold')" title="Bold (Ctrl+B)"><strong>B</strong></button>
+                        <button type="button" onclick="formatText('italic')" title="Italic (Ctrl+I)"><em>I</em></button>
+                        <button type="button" onclick="formatText('code')" title="Code Block (Ctrl+K)">{'}'}</button>
+                        <button type="button" onclick="addHeading()" title="Add Heading (Ctrl+H)">H</button>
+                        <button type="button" onclick="addList('bullet')" title="Bullet List">•</button>
+                        <button type="button" onclick="addList('number')" title="Numbered List">1.</button>
+                    </div>
+                    <textarea id="blogContent" 
+                            placeholder="Share your campus experience here... You can use Markdown formatting!" 
+                            required
+                            aria-label="Story content"></textarea>
+                    <span class="field-helper">Use the toolbar above or Markdown to format your story</span>
+                </div>
+
+                <div class="post-meta">
+                    <div class="form-group">
+                        <input type="text" 
+                               id="tags" 
+                               placeholder="Add tags to help others find your story"
+                               aria-label="Story tags">
+                        <span class="tags-helper">Separate with commas</span>
+                    </div>
+                    
+                    <label class="featured-checkbox">
+                        <input type="checkbox" id="featured">
+                        <span>Mark as Featured Story</span>
+                        <span class="tooltip" title="Featured stories appear at the top of the feed">ℹ️</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="publish-btn">Publish Story</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+    <div class="main-container">
+        <main class="content">
             <section class="blog-posts" id="stories">
                 <div class="posts-header">
                     <h2>Featured Stories</h2>
@@ -73,8 +144,8 @@
                     <!-- Blog posts will be dynamically added here -->
                 </div>
             </section>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <footer>
         <div class="footer-content">
@@ -87,7 +158,7 @@
                 <ul>
                     <li><a href="#write">Write a Story</a></li>
                     <li><a href="#stories">Read Stories</a></li>
-                    <li><a href="#about">About Us</a></li>
+                    <li><a href="about.html">About Us</a></li>
                     <li><a href="#guidelines">Community Guidelines</a></li>
                 </ul>
             </div>
@@ -107,6 +178,55 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/2.1.3/marked.min.js"></script>
+    <script src="auth.js"></script>
     <script src="script.js"></script>
+
+    <!-- Direct Messages Panel -->
+    <div class="dm-trigger" id="dmTrigger">
+        <span class="dm-icon">💬</span>
+        <span class="dm-badge" id="dmBadge">0</span>
+    </div>
+
+    <div class="dm-panel" id="dmPanel">
+        <div class="dm-header">
+            <h3>Messages</h3>
+            <div class="dm-actions">
+                <button class="dm-minimize" id="dmMinimize">−</button>
+                <button class="dm-close" id="dmClose">×</button>
+            </div>
+        </div>
+        
+        <div class="dm-search">
+            <input type="text" id="dmSearch" placeholder="Search users...">
+        </div>
+        
+        <div class="dm-users" id="dmUsers">
+            <!-- User list will be populated here -->
+        </div>
+        
+        <div class="dm-chat" id="dmChat">
+            <div class="dm-chat-header">
+                <button class="dm-back" id="dmBack">←</button>
+                <div class="dm-recipient">
+                    <div class="dm-recipient-avatar"></div>
+                    <span class="dm-recipient-name"></span>
+                </div>
+                <span class="dm-typing-indicator"></span>
+            </div>
+            
+            <div class="dm-messages" id="dmMessages">
+                <!-- Messages will appear here -->
+            </div>
+            
+            <div class="dm-input">
+                <input type="text" id="dmInput" placeholder="Type a message...">
+                <button id="dmSend">
+                    <span class="dm-send-icon">✈️</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="direct-messages.js"></script>
 </body>
 </html> 
